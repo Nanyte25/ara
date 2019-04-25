@@ -1,0 +1,27 @@
+- name: Install psycopg2
+  pip:
+    name: psycopg2
+    state: present
+    virtualenv: "{{ ara_tests_virtualenv }}"
+    virtualenv_python: python3
+
+- name: Start a postgresql container
+  docker_container:
+    name: ara-pgsql
+    image: postgres:10
+    state: started
+    ports:
+     - "5432:5432"
+    env:
+      POSTGRES_DB: ara
+      POSTGRES_USER: ara
+      POSTGRES_PASSWORD: password
+
+- name: Set up configuration parameters for postgresql
+  set_fact:
+    ARA_DATABASE_ENGINE: django.db.backends.postgresql
+    ARA_DATABASE_NAME: ara
+    ARA_DATABASE_USER: ara
+    ARA_DATABASE_PASSWORD: password
+    ARA_DATABASE_HOST: 127.0.0.1
+    ARA_DATABASE_PORT: 5432

@@ -16,6 +16,12 @@
 #  You should have received a copy of the GNU General Public License
 #  along with ARA.  If not, see <http://www.gnu.org/licenses/>.
 
+- name: Include OS family/distribution specific variables
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution }}.yaml"
+    - "{{ ansible_os_family }}.yaml"
+
 - name: Clean up integration test root
   file:
     path: "{{ ara_tests_root }}"
@@ -71,6 +77,9 @@
   command: "{{ ara_tests_virtualenv }}/bin/python -m ara.setup.plugins"
   register: ara_setup_plugins
 
+- name: Set up database driver for postgresql
+  include_tasks: postgresql.yaml
+
 # These aren't in the same task (i.e, with loop) so we can tell individual test
 # runs apart easily rather than keeping all the output bundled in a single task.
 # TODO: Add validation for the tests
@@ -81,6 +90,13 @@
     ARA_LOG_LEVEL: DEBUG
     ARA_BASE_DIR: "{{ ara_tests_data }}"
     ARA_SECRET_KEY: testing
+    # If testing a custom database engine
+    ARA_DATABASE_ENGINE: "{{ ARA_DATABASE_ENGINE | default(omit) }}"
+    ARA_DATABASE_USER: "{{ ARA_DATABASE_USER | default(omit) }}"
+    ARA_DATABASE_NAME: "{{ ARA_DATABASE_NAME | default(omit) }}"
+    ARA_DATABASE_PASSWORD: "{{ ARA_DATABASE_PASSWORD | default(omit) }}"
+    ARA_DATABASE_HOST: "{{ ARA_DATABASE_HOST | default(omit) }}"
+    ARA_DATABASE_PORT: "{{ ARA_DATABASE_PORT | default(omit) }}"
   vars:
     _ansible_playbook: "{{ ara_tests_virtualenv }}/bin/ansible-playbook -vvv"
     _test_root: "{{ _ara_tests_repository }}/tests/integration"

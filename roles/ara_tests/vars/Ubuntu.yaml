@@ -1,0 +1,8 @@
+ara_tests_postgresql_packages:
+  - postgresql-server-dev-10
+  - gcc
+
+ara_tests_mariadb_packages:
+  - libmysqlclient-dev
+  - gcc
+  - python3-devel

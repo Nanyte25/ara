@@ -1,0 +1,28 @@
+- name: Install mysqlclient
+  pip:
+    name: mysqlclient
+    state: present
+    virtualenv: "{{ ara_tests_virtualenv }}"
+    virtualenv_python: python3
+
+- name: Start a mariadb container
+  docker_container:
+    name: ara-mariadb
+    image: mariadb:10
+    state: started
+    ports:
+     - "3306:3306"
+    env:
+      MYSQL_DATABASE: ara
+      MYSQL_USER: ara
+      MYSQL_PASSWORD: password
+      MYSQL_RANDOM_ROOT_PASSWORD: true
+
+- name: Set up configuration parameters for mariadb
+  set_fact:
+    ARA_DATABASE_ENGINE: django.db.backends.mysql
+    ARA_DATABASE_NAME: ara
+    ARA_DATABASE_USER: ara
+    ARA_DATABASE_PASSWORD: password
+    ARA_DATABASE_HOST: 127.0.0.1
+    ARA_DATABASE_PORT: 3306

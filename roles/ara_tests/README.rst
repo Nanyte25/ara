@@ -2,7 +2,10 @@ ansible-role-ara-tests
 ======================
 
 An Ansible role that installs ARA and Ansible to run quick and inexpensive
-tests that do not require superuser privileges.
+tests that do not require superuser privileges for testing with sqlite.
+
+Testing with MySQL and PostgreSQL assumes that Docker is installed and running.
+The role takes care of creating containerized databases for test purposes.
 
 Role Variables
 --------------
