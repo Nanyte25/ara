@@ -77,6 +77,34 @@
   command: "{{ ara_tests_virtualenv }}/bin/python -m ara.setup.plugins"
   register: ara_setup_plugins
 
+- name: Install psycopg2
+  pip:
+    name: psycopg2
+    state: present
+    virtualenv: "{{ ara_tests_virtualenv }}"
+    virtualenv_python: python3
+
+- name: Set up configuration parameters for postgresql
+  set_fact:
+    _api_database_engine: django.db.backends.postgresql
+    _api_database_name: ara
+    _api_database_user: ara
+    _api_database_password: password
+    _api_database_host: 127.0.0.1
+    _api_database_port: 5432
+
+- name: Start a postgresql container
+  docker_container:
+    name: ara_tests_postgresql
+    image: postgres:10
+    state: started
+    ports:
+     - "{{ _api_database_port }}:{{ _api_database_port }}"
+    env:
+      POSTGRES_DB: "{{ _api_database_name }}"
+      POSTGRES_USER: "{{ _api_database_user }}"
+      POSTGRES_PASSWORD: "{{ _api_database_password }}"
+
 - name: Set up database driver for postgresql
   include_tasks: postgresql.yaml
 

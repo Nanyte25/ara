@@ -1,0 +1,31 @@
+- name: Install the ARA API with postgresql
+  hosts: all
+  gather_facts: yes
+  vars:
+    ara_api_database_engine: django.db.backends.postgresql
+    ara_api_database_name: ara
+    ara_api_database_user: ara
+    ara_api_database_password: password
+    ara_api_database_host: 127.0.0.1
+    ara_api_database_port: 5432
+  pre_tasks:
+    - name: Install dependencies for Fedora
+      become: yes
+      package:
+        name:
+          - postgresql-devel
+          - gcc
+
+    - name: Start a postgresql container
+      docker_container:
+        name: ara_tests_postgresql
+        image: postgres:10
+        state: started
+        ports:
+          - "{{ ara_api_database_port }}:{{ ara_api_database_port }}"
+        env:
+          POSTGRES_DB: "{{ ara_api_database_name }}"
+          POSTGRES_USER: "{{ ara_api_database_user }}"
+          POSTGRES_PASSWORD: "{{ ara_api_database_password }}"
+  roles:
+    - ara_api

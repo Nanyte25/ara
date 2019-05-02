@@ -22,12 +22,6 @@ ara_api_required_packages:
   - python3-libselinux
   - policycoreutils-python-utils
 
-ara_api_mariadb_packages:
-  - mysql-devel
-  - python3-devel
-  - zlib-devel
-  - gcc
-
 ara_api_postgresql_packages:
   - postgresql-devel
   - gcc
