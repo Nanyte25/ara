@@ -22,18 +22,25 @@ import logging
 import os
 import threading
 
-from django.core.handlers.wsgi import WSGIHandler
-from django.core.servers.basehttp import ThreadedWSGIServer, WSGIRequestHandler
-
 from ara.clients.http import AraHttpClient
+from ara.setup.exceptions import MissingDjangoException
+
+try:
+    from django.core.handlers.wsgi import WSGIHandler
+    from django.core.servers.basehttp import ThreadedWSGIServer, WSGIRequestHandler
+except ImportError:
+    raise MissingDjangoException
 
 
 class AraOfflineClient(AraHttpClient):
     def __init__(self):
         self.log = logging.getLogger(__name__)
 
-        from django import setup as django_setup
-        from django.core.management import execute_from_command_line
+        try:
+            from django import setup as django_setup
+            from django.core.management import execute_from_command_line
+        except ImportError:
+            raise MissingDjangoException
 
         os.environ.setdefault("DJANGO_SETTINGS_MODULE", "ara.server.settings")
 
